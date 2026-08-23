@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: file-upload-rustfs
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/appdb
+    username: appuser
+    password: apppassword
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+        
+storage:
+  rustfs:
+    endpoint: ${RUSTFS_URL:http://localhost:9000}
+    region: ${RUSTFS_REGION:us-east-1}
+    access-key: ${RUSTFS_ACCESS_KEY:admin}
+    secret-key: ${RUSTFS_SECRET_KEY:1233}
+    bucket: ${RUSTFS_BUCKET:storages}
