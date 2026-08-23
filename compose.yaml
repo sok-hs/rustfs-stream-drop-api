@@ -1,0 +1,47 @@
+services:
+  rustfs:
+    image: rustfs/rustfs:latest
+    restart: unless-stopped
+
+    security_opt:
+      - no-new-privileges:true
+
+    command:
+      - /data
+
+    ports:
+      # Accessible only from this computer
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
+
+    environment:
+      RUSTFS_ADDRESS: "0.0.0.0:9000"
+      RUSTFS_CONSOLE_ADDRESS: "0.0.0.0:9001"
+      RUSTFS_CONSOLE_ENABLE: "true"
+
+      RUSTFS_ACCESS_KEY: "${RUSTFS_ACCESS_KEY:-LOCALRUSTFSAPP}"
+      RUSTFS_SECRET_KEY: "${RUSTFS_SECRET_KEY:-change-this-local-secret}"
+
+      RUSTFS_OBS_LOGGER_LEVEL: "error"
+
+    volumes:
+      - rustfs-data:/data
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "sh",
+          "-c",
+          "curl -fsS http://127.0.0.1:9000/health"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+volumes:
+  rustfs-data:
+
+
+# docker run -d --name rustfs --restart unless-stopped --env-file rustfs.env -p 127.0.0.1:9000:9000 -p 127.0.0.1:9001:9001 -v rustfs-data:/data rustfs/rustfs:latest /data
