@@ -1,8 +1,9 @@
 package com.project.file.upload.rustfs.controller;
 
 import com.project.file.upload.rustfs.model.*;
+import com.project.file.upload.rustfs.model.presign_upload.PresignDownloadUrlResponse;
 import com.project.file.upload.rustfs.service.FileStorageService;
-import com.project.file.upload.rustfs.service.PresignedUploadService;
+import com.project.file.upload.rustfs.service.PresignUploadService;
 import java.io.IOException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,14 +26,14 @@ import org.springframework.web.multipart.MultipartFile;
 })
 public class FileUploadController {
   private final FileStorageService fileStorageService;
-  private final PresignedUploadService presignedUploadService;
+  private final PresignUploadService presignUploadService;
 
   public FileUploadController(
       FileStorageService fileStorageService,
-      PresignedUploadService presignedUploadService
+      PresignUploadService presignUploadService
   ) {
     this.fileStorageService = fileStorageService;
-    this.presignedUploadService = presignedUploadService;
+    this.presignUploadService = presignUploadService;
   }
 
   @PostMapping(
@@ -56,11 +57,16 @@ public class FileUploadController {
   @PostMapping("/presign/upload")
   @ResponseStatus(HttpStatus.CREATED)
   public PresignUploadUrlResponse createUpload(@RequestBody PresignUploadUrlRequest request) {
-    return presignedUploadService.createUpload(request);
+    return presignUploadService.createUpload(request);
   }
 
   @GetMapping("/presign/preview")
   public PresignPreviewUrlResponse createPresignPreviewUrl(@RequestParam("key") String key) {
-    return presignedUploadService.createPresignPreviewUrl(key);
+    return presignUploadService.createPresignPreviewUrl(key);
+  }
+
+  @GetMapping("/presign/download")
+  public PresignDownloadUrlResponse createPresignDownloadUrl(@RequestParam("key") String key) {
+    return presignUploadService.createPresignDownloadUrl(key);
   }
 }

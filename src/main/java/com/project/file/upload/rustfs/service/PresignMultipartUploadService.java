@@ -1,15 +1,15 @@
 package com.project.file.upload.rustfs.service;
 
 import com.project.file.upload.rustfs.config.RustFsProperties;
-import com.project.file.upload.rustfs.model.presignedMultipartUpload.AbortRequest;
-import com.project.file.upload.rustfs.model.presignedMultipartUpload.CompleteRequest;
-import com.project.file.upload.rustfs.model.presignedMultipartUpload.CompleteRequest.CompletedPartDTO;
-import com.project.file.upload.rustfs.model.presignedMultipartUpload.CompleteResponse;
-import com.project.file.upload.rustfs.model.presignedMultipartUpload.PresignedMultipartUploadRequest;
-import com.project.file.upload.rustfs.model.presignedMultipartUpload.PresignedMultipartUploadResponse;
-import com.project.file.upload.rustfs.model.presignedMultipartUpload.StartRequest;
-import com.project.file.upload.rustfs.model.presignedMultipartUpload.StartResponse;
-import com.project.file.upload.rustfs.model.presignedMultipartUpload.StartResponse.PresignedPart;
+import com.project.file.upload.rustfs.model.presigned_multipart_upload.AbortRequest;
+import com.project.file.upload.rustfs.model.presigned_multipart_upload.CompleteRequest;
+import com.project.file.upload.rustfs.model.presigned_multipart_upload.CompleteResponse;
+import com.project.file.upload.rustfs.model.presigned_multipart_upload.CompletedPartDTO;
+import com.project.file.upload.rustfs.model.presigned_multipart_upload.PresignedMultipartUploadRequest;
+import com.project.file.upload.rustfs.model.presigned_multipart_upload.PresignedMultipartUploadResponse;
+import com.project.file.upload.rustfs.model.presigned_multipart_upload.StartRequest;
+import com.project.file.upload.rustfs.model.presigned_multipart_upload.StartResponse;
+import com.project.file.upload.rustfs.model.presigned_multipart_upload.StartResponse.PresignedPart;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -38,7 +38,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 import software.amazon.awssdk.services.s3.presigner.model.UploadPartPresignRequest;
 
 @Service
-public class PresignedMultipartUploadService {
+public class PresignMultipartUploadService {
 
   // Define max file size to 30MB
   private static final long MAX_FILE_SIZE = 30L * 1024L * 1024L;
@@ -58,7 +58,7 @@ public class PresignedMultipartUploadService {
   private final RustFsProperties rustFsProperties;
   private final S3Client s3Client;
 
-  public PresignedMultipartUploadService(
+  public PresignMultipartUploadService(
       S3Presigner s3Presigner,
       RustFsProperties rustFsProperties,
       S3Client s3Client
@@ -144,6 +144,7 @@ public class PresignedMultipartUploadService {
 
     CompleteMultipartUploadRequest completeRequest = CompleteMultipartUploadRequest
         .builder()
+        .bucket(rustFsProperties.getBucket())
         .key(request.getKey())
         .uploadId(request.getUploadId())
         .multipartUpload(completedUpload)
@@ -155,7 +156,6 @@ public class PresignedMultipartUploadService {
         request.getKey(),
         response.eTag()
     );
-
   }
 
   public PresignedMultipartUploadResponse presignedMultipartUpload(PresignedMultipartUploadRequest request) {
@@ -256,7 +256,7 @@ public class PresignedMultipartUploadService {
     return new PresignedPart(partNumber, presigned.url().toString());
   }
 
-  private void abort(AbortRequest request) {
+  public void abort(AbortRequest request) {
     if (request.getKey() == null || request.getUploadId() == null) {
       return;
     }

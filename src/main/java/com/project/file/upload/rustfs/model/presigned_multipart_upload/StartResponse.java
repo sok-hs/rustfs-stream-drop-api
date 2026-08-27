@@ -1,4 +1,4 @@
-package com.project.file.upload.rustfs.model.presignedMultipartUpload;
+package com.project.file.upload.rustfs.model.presigned_multipart_upload;
 
 import java.util.List;
 import lombok.AllArgsConstructor;

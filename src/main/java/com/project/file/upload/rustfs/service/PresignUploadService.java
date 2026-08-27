@@ -3,6 +3,7 @@ package com.project.file.upload.rustfs.service;
 import com.project.file.upload.rustfs.config.RustFsProperties;
 import com.project.file.upload.rustfs.model.PresignUploadUrlRequest;
 import com.project.file.upload.rustfs.model.PresignUploadUrlResponse;
+import com.project.file.upload.rustfs.model.presign_upload.PresignDownloadUrlResponse;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -23,7 +24,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequ
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 @Service
-public class PresignedUploadService {
+public class PresignUploadService {
 
   private static final Duration EXPIRATION = Duration.ofMinutes(5);
 
@@ -34,7 +35,7 @@ public class PresignedUploadService {
   private final S3Presigner presigner;
   private final RustFsProperties properties;
 
-  public PresignedUploadService(
+  public PresignUploadService(
       S3Presigner presigner,
       RustFsProperties properties
   ) {
@@ -81,6 +82,7 @@ public class PresignedUploadService {
     GetObjectRequest getObjectRequest = GetObjectRequest.builder()
             .bucket(properties.getBucket())
             .key(key)
+            .responseContentDisposition("inline")
             .build();
 
     GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
@@ -93,6 +95,22 @@ public class PresignedUploadService {
     return PresignPreviewUrlResponse.builder().url(presignedGetObjectRequest.url().toString()).build();
   }
 
+  public PresignDownloadUrlResponse createPresignDownloadUrl(String key) {
+    GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+        .bucket(properties.getBucket())
+        .key(key)
+        .responseContentDisposition("attachment")
+        .build();
+
+    GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+        .signatureDuration(EXPIRATION)
+        .getObjectRequest(getObjectRequest)
+        .build();
+
+    PresignedGetObjectRequest presignedGetObjectRequest = presigner.presignGetObject(presignRequest);
+
+    return PresignDownloadUrlResponse.builder().url(presignedGetObjectRequest.url().toString()).build();
+  }
 
   // === Utils ===
   private void validate(PresignUploadUrlRequest request) {

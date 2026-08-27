@@ -1,12 +1,14 @@
 package com.project.file.upload.rustfs.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Entity
-@Table(name = UserEntity.TABLE_NAME)
-public class UserEntity {
+@Builder
+@Table(name = User.TABLE_NAME)
+public class User {
 
     public static final String TABLE_NAME = "users";
 
@@ -17,6 +19,4 @@ public class UserEntity {
     @Column(length = 100)
     private String username;
 
-    @Column(length = 100)
-    private String key;
 }
